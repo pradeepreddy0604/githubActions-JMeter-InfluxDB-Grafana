@@ -26,7 +26,7 @@ services:
       - ./grafana/provisioning:/etc/grafana/provisioning
 
   jpetstore:
-    image: qburst/jpetstore
+    image: jloisel/jpetstore6:latest
     container_name: jpetstore
     ports:
       - "8080:8080"
