@@ -1,0 +1,22 @@
+name: Run JMeter Pipeline
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Start Stack
+        run: docker-compose up -d
+      - name: Wait for InfluxDB
+        run: |
+          for i in {1..30}; do
+            curl -f -s http://localhost:8086/health && break
+            sleep 3
+          done
+      - name: Trigger Jenkins Job
+        run: |
+          echo "Trigger your Jenkins job here"
