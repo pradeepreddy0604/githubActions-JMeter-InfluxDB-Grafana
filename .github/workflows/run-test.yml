@@ -2,7 +2,9 @@ name: Run JMeter Pipeline
 
 on:
   workflow_dispatch:
-
+  push:
+    branches:
+      - main
 jobs:
   run:
     runs-on: ubuntu-latest
