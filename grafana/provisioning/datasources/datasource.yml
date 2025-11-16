@@ -1,0 +1,16 @@
+apiVersion: 1
+
+datasources:
+  - name: InfluxDB-Flux
+    uid: influxdb-flux
+    type: influxdb
+    access: proxy
+    isDefault: true
+    url: http://influxdb:8086
+    jsonData:
+      version: Flux
+      organization: perf-org
+      defaultBucket: jmeter
+      tlsSkipVerify: true
+    secureJsonData:
+      token: my-super-token
