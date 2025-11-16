@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Start Stack
-        run: docker-compose up -d
+        run: docker compose up -d
       - name: Wait for InfluxDB
         run: |
           for i in {1..30}; do
