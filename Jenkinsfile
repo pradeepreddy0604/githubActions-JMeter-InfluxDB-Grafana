@@ -15,6 +15,7 @@ pipeline {
                         id: 'UserConfigInput',
                         message: 'Fill the following test configuration and click Start Test:',
                         ok: 'Start Test',         // <-- This is your START BUTTON
+                        submitter: '',        // <-- THE FIX YOU WERE MISSING !!!
                         parameters: [
 
                             string(name: 'JMETER_SCRIPT', defaultValue: 'Scripts/s.jmx',
