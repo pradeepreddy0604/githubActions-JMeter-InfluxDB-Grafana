@@ -1,4 +1,4 @@
-name: Run JMeter Pipeline
+name: JMeter Pipeline via Jenkins
 
 on:
   workflow_dispatch:
@@ -11,14 +11,39 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Start Stack
+      
+      - name: Start Full Docker Stack (Jenkins, InfluxDB, JPetStore)
         run: docker compose up -d
-      - name: Wait for InfluxDB
+
+      - name: Wait for Services (Jenkins on 8081, InfluxDB on 8086)
         run: |
-          for i in {1..30}; do
-            curl -f -s http://localhost:8086/health && break
+          echo "Waiting for Jenkins (on port 8081) and InfluxDB (on port 8086)..."
+          for i in {1..120}; do
+            # Check Jenkins health on port 8081
+            JENKINS_HEALTH=$(curl -f -s -o /dev/null -w "%{http_code}" http://localhost:8081/login)
+            # Check InfluxDB health
+            INFLUX_HEALTH=$(curl -f -s -o /dev/null -w "%{http_code}" http://localhost:8086/health)
+
+            if [[ "$JENKINS_HEALTH" == "200" && "$INFLUX_HEALTH" == "200" ]]; then
+              echo "Stack is ready."
+              break
+            fi
+            if [ $i -eq 120 ]; then
+              echo "Timeout waiting for services."
+              exit 1
+            fi
             sleep 3
           done
-      - name: Trigger Jenkins Job
+
+      - name: Trigger Jenkins Job & Wait for User Input
         run: |
-          echo "Trigger your Jenkins job here"
+          # 🚨 IMPORTANT: Replace 'Your_Jenkins_Job_Name', 'YOUR_USER', and 'YOUR_API_TOKEN'
+          JOB_URL="http://localhost:8081/job/Your_Jenkins_Job_Name/build"
+          
+          echo "Triggering Jenkins job on port 8081..."
+          
+          # This command triggers the job. It will PAUSE in the 'User Input Popup' stage.
+          curl -X POST "${JOB_URL}?token=YOUR_API_TOKEN" \
+            --user "YOUR_USER:YOUR_API_TOKEN"
+            
+          echo "✅ Build triggered. It is now PAUSED, waiting for you to fill the form and click 'Start Test' on the Jenkins UI (accessible via host port 8081)."
