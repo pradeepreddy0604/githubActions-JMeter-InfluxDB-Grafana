@@ -29,9 +29,8 @@ services:
     image: jloisel/jpetstore6:latest
     container_name: jpetstore
     ports:
-      - "8080:8080" # JPetStore runs on host port 8080
+      - "8080:8080"
 
-  # --- NEW SERVICE: JENKINS ---
   jenkins:
     image: jenkins/jenkins:lts-jdk17
     container_name: jenkins
@@ -41,12 +40,15 @@ services:
       - "8081:8080" # Jenkins runs on host port 8081 (Internal 8080)
       - "50000:50000"
     volumes:
-      - jenkins_home:/var/jenkins_home 
-      - /var/run/docker.sock:/var/run/docker.sock # Allows Jenkins to run Docker commands
-      # Mount the project directory to access the Jenkinsfile if needed, 
-      # though generally not required for declarative pipelines.
-      # - $PWD:/home/jenkins/workspace 
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    
+    # --- ADDED HEALTH CHECK ---
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/login"] # Checks internal Jenkins port 8080
+      interval: 10s
+      timeout: 5s
+      retries: 30 # Retries for up to 5 minutes to wait for Jenkins startup
 
 volumes:
   jenkins_home:
-# ... (other volumes remain the same) ...
